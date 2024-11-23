@@ -1,5 +1,11 @@
+require('dotenv').config({ path: './src/.env' });
 const express = require('express');
+const connectDb = require('../config/dbConnection');
 
+connectDb().catch((err) => {
+	console.error('An error occurred while connecting to the database:', err.message);
+	process.exit(1);
+});
 
 const app = express();
 
