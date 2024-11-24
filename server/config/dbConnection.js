@@ -12,8 +12,6 @@ const connectDb = async () => {
     );
   } catch (err) {
     throw new Error("Database connection failed");
-  } finally {
-    await mongoose.disconnect();
   }
 };
 

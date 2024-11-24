@@ -8,11 +8,10 @@ connectDb().catch((err) => {
 });
 
 const app = express();
-
 const port = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json());
+app.use('/users', require('./routes/userRoutes'));
 
 // Start the server
 app.listen(port, () => {
