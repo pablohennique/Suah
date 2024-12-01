@@ -11,8 +11,8 @@ class AppServer {
 	constructor(controllers = []) {
 		dotenv.config({ path: './src/.env' });
 		this.connectionDatabase();
-		this.initializeControllers(controllers);
 		this.initMiddleWares();
+		this.initializeControllers(controllers);
 		this.initErrorHandling();
 	}
 
@@ -40,11 +40,11 @@ class AppServer {
 	}
 
 	initMiddleWares() {
-		this._app.use (express.json());
+		this._app.use(express.json());
 	}
 
 	initErrorHandling() {
-		this._app.use (ErrorsMiddleware);
+		this._app.use(ErrorsMiddleware);
 	}
 
 	startListening() {
