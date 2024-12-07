@@ -3,7 +3,14 @@ const bcrypt = require('bcrypt');
 const { UserRepository } = require('../schema');
 const { Controller } = require('../core');
 const { UserService	} = require('../services');
-const asyncHandler = require('express-async-handler');
+const { MIN_LENGTH_PASS, REGEX_EMAIL } = require('../constants');
+const {
+  ServerException,
+  NotFoundException,
+  BadRequestException,
+  UnauthorizedException,
+  ForbiddenException,
+} = require("../exceptions");
 
 class UserController extends Controller {
 	_path = '/user';
@@ -13,75 +20,75 @@ class UserController extends Controller {
 		this.initializeRoutes();
 	}
 
-	registerAccount = asyncHandler(async (req, res) => {
+	async registerAccount (req, res, next) {
     const userRequest = req.body;
-		const userExisting = await UserRepository.findOne({ email: userRequest.email });
 
-		if (userExisting) {
-      const error = new Error('Error encountered while craeting user.');
-      error.status = 400;
-      error.errors = 'Email already exists under a another user.';
-      throw error;
-		}
+    try {
+      const userExisting = await UserRepository.findOne({ email: userRequest.email });
 
-		const userCreated = await UserService.createUser(userRequest);
+      if (userExisting) {
+        return next(new BadRequestException('Email already exists under a another user.'));
+      }
 
-    if (!userCreated) {
-      const error = new Error('Error encountered while craeting user.');
-      error.status = 400;
-      error.errors = 'Unknown errored encountered when attempting to save user in database.';
-      throw error;
+      const userCreated = await UserService.createUser(userRequest);
+
+      res.status(200).json({
+        status: 200,
+        message: 'User created successfully',
+        id: userCreated._id,
+        email: userCreated.email
+      });
+    } catch (error) {
+      return next(new ServerException(error.message));
+    }
+	};
+
+	async validateBeforeCreateAccount (req, res, next) {
+    const userRequest = req.body;
+
+    if (!userRequest) {
+      return next(new BadRequestException('User is not provided'));
     }
 
-    res.json({
-      status: 200,
-      message: 'User created successfully',
-      id: userCreated._id,
-      email: userCreated.email
-    });
-	});
+    const errors = [];
 
-	validateBeforeCreateAccount = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) {
-      const errors = [];
       if (!email) {
         errors.push({
-          field: "email",
-          message: "Email is not empty!",
+          field: 'email',
+          message: 'Email is empty!',
         });
       }
 
       if (!password) {
         errors.push({
-          field: "password",
-          message: "Password is not empty!",
+          field: 'password',
+          message: 'Password is empty!',
         });
       }
+    }
 
-      if (password.length < MIN_LENGTH_PASS) {
-        errors.push({
-          field: "password",
-          message: "Password must be greater than or equal to 8 characters!",
-        });
-      }
+    if (password.length < MIN_LENGTH_PASS) {
+      errors.push({
+        field: 'password',
+        message: 'Password must be greater than or equal to '  + MIN_LENGTH_PASS + ' characters!',
+      });
+    }
 
-      if (!REGEX_EMAIL.test(email)) {
-        errors.push({
-          field: "email",
-          message: "Email invalid!",
-        });
-      }
+    if (!REGEX_EMAIL.test(email)) {
+      errors.push({
+        field: 'email',
+        message: 'Email invalid!',
+      });
+    }
 
-			return res.status(400).json({
-				status: 400,
-				message: 'Bad request',
-				errors: errors
-			});
+    if (errors.length > 0) {
+      return next(new NotFoundException('Missing or incorrect information', errors));
     }
 
     next();
-	});
+	};
 
 	initializeRoutes() {
 		this._router.post(
