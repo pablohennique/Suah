@@ -30,7 +30,6 @@ class UserController extends Controller {
       }
 
       const userCreated = await UserService.createUser(userRequest);
-
       res.status(200).json({
         status: 200,
         message: 'User created successfully',
@@ -94,17 +93,17 @@ class UserController extends Controller {
     const user = await UserRepository.findOne({ email });
 
     if (!user) {
-      return next(new NotFoundException("User not found"));
+      return next(new NotFoundException('User not found'));
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return next(new BadRequestException("Password not matching!"));
+      return next(new BadRequestException('Password is not correct'));
     }
 
     if (!user.active) {
-      return next(new ForbiddenException("User has been set to inactive!"));
+      return next(new ForbiddenException('User has been set to inactive!'));
     }
 
     req.user = user;
@@ -120,17 +119,12 @@ class UserController extends Controller {
         email,
       };
 
-
-      // Need to create functions into userService to handle this
-
-      const token = await AuthService.generateToken(payload);
-      const refreshToken = await AuthService.generateRefreshToken(payload);
+      const token = await UserService.generateToken(payload);
       return res.json({
         status: 200,
         message: "success",
         data: {
           access_token: token,
-          refresh_token: refreshToken,
           user: payload,
         },
       });
@@ -145,6 +139,12 @@ class UserController extends Controller {
 			this.validateBeforeCreateAccount,
       this.registerAccount
 		);
+
+    this._router.post(
+      `${this._path}/login`,
+      this.validateBeforeLogin,
+      this.login
+    );
 	}
 }
 
