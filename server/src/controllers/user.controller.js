@@ -8,8 +8,7 @@ const {
   ServerException,
   NotFoundException,
   BadRequestException,
-  UnauthorizedException,
-  ForbiddenException,
+  ForbiddenException
 } = require("../exceptions");
 
 class UserController extends Controller {
@@ -89,6 +88,56 @@ class UserController extends Controller {
 
     next();
 	};
+
+  async validateBeforeLogin(req, res, next) {
+    const { email, password } = req.body;
+    const user = await UserRepository.findOne({ email });
+
+    if (!user) {
+      return next(new NotFoundException("User not found"));
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return next(new BadRequestException("Password not matching!"));
+    }
+
+    if (!user.active) {
+      return next(new ForbiddenException("User has been set to inactive!"));
+    }
+
+    req.user = user;
+    next();
+  }
+
+  async login(req, res, next) {
+    try {
+      const { email, _id } = req.user;
+
+      const payload = {
+        id: _id,
+        email,
+      };
+
+
+      // Need to create functions into userService to handle this
+
+      const token = await AuthService.generateToken(payload);
+      const refreshToken = await AuthService.generateRefreshToken(payload);
+      return res.json({
+        status: 200,
+        message: "success",
+        data: {
+          access_token: token,
+          refresh_token: refreshToken,
+          user: payload,
+        },
+      });
+    } catch (error) {
+      next(new ServerException(error.message));
+    }
+  }
 
 	initializeRoutes() {
 		this._router.post(
