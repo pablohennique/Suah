@@ -30,7 +30,7 @@ export const NAV_ITEMS = [
     ],
   },
   {
-    label: 'Priging',
+    label: 'Pricing',
     href: '#',
   },
   {

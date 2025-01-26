@@ -84,7 +84,7 @@ const Header = () => {
           justify={'flex-end'}
           direction={'row'}
           spacing={6}>
-          <Button as={'a'} fontSize={'sm'} fontWeight={400} variant={'link'} href={'#'}>
+          <Button as={'a'} fontSize={'sm'} fontWeight={400} variant={'link'} href={'/login'}>
             Sign In
           </Button>
           <Button
@@ -94,7 +94,7 @@ const Header = () => {
             fontWeight={600}
             color={'white'}
             bg={'pink.400'}
-            href={'#'}
+            href={'/register'}
             _hover={{
               bg: 'pink.300',
             }}>
