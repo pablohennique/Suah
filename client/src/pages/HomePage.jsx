@@ -21,6 +21,8 @@ import {
   Icon,
   useColorModeValue,
   createIcon,
+  Image,
+  Flex
 } from '@chakra-ui/react'
 
 const HomePage = () => {
@@ -86,6 +88,13 @@ const HomePage = () => {
                 transform={'rotate(10deg)'}>
                 Starting at $15/mo
               </Text>
+            </Box>
+            <Box
+              width="150px"
+              height="150px"
+              ml={4}
+              textAlign="center">
+              <Image src="/huronIcon.png" alt="Suah Pet" objectFit="contain" />
             </Box>
           </Stack>
         </Stack>

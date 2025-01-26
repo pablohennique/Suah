@@ -6,7 +6,7 @@ import {
   PopoverContent,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { NAV_ITEMS } from './data/navItems'
+import { NAV_ITEMS } from './constants/navItems'
 import DesktopSubNav from './DesktopSubNav'
 
 const DesktopNav = () => {
