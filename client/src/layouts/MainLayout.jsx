@@ -1,7 +1,6 @@
 import { Box, Stack } from "@chakra-ui/react";
 import { Outlet } from 'react-router-dom';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import { Footer, Header } from "../components";
 
 const MainLayout = () => {
   return (
