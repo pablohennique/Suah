@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const { ErrorsMiddleware } = require('./middleware');
@@ -35,11 +36,12 @@ class AppServer {
 
 	initializeControllers(controllers = []) {
 		controllers.forEach(c => {
-			this._app.use('/', c._router);
+			this._app.use('/api', c._router);
 		});
 	}
 
 	initMiddleWares() {
+		this._app.use(cors());
 		this._app.use(express.json());
 	}
 

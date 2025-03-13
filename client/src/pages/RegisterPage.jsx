@@ -10,6 +10,7 @@ import {
   Link,
 } from '@chakra-ui/react';
 import { useState } from 'react';
+import { serviceClient } from '../services';
 
 const RegisterPage = () => {
   const [name, setName] = useState('');
@@ -20,6 +21,10 @@ const RegisterPage = () => {
     e.preventDefault();
     console.log('Register with:', { name, email, password });
     // Call your API service here
+    serviceClient._userService.register({ email, password})
+      .then((res) => {
+        console.log('Login response:', res);
+      });
   };
 
   return (
