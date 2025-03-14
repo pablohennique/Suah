@@ -8,23 +8,30 @@ import {
   Text,
   VStack,
   Link,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { serviceClient } from '../services';
+import { getErrorMessage } from '../utils';
+import { PAGE_KEYS } from '../constants';
 
 const RegisterPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Register with:', { name, email, password });
-    // Call your API service here
-    serviceClient._userService.register({ email, password})
-      .then((res) => {
-        console.log('Login response:', res);
-      });
+    const res = await serviceClient._userService.register({ email, password});
+    if (res.status === 200) {
+      setErrorMessage('');
+      window.location.href = PAGE_KEYS.HomePage;
+    } else {
+      setErrorMessage(getErrorMessage(res));
+    }
   };
 
   return (
@@ -40,6 +47,12 @@ const RegisterPage = () => {
       <Heading mb={6} size="lg" textAlign="center">
         Register
       </Heading>
+      {errorMessage && (
+        <Alert status="error" mb={4}>
+          <AlertIcon />
+          {errorMessage}
+        </Alert>
+      )}
       <form onSubmit={handleSubmit}>
         <VStack spacing={4}>
           <FormControl isRequired>

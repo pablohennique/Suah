@@ -10,8 +10,10 @@ export class UserService {
 		try {
 			return await this._axios.post(`${this._path}/register`, data);
 		} catch (e)	{
-			"🚀 ~ file: authService.js ~ AuthService ~ resiter ~ e",
-			e
+			console.log(
+				"🚀 ~ file: userService.js ~ UserService ~ register ~ e",
+				e
+			);
 			return e;
 		}
 	}
